@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor.Animations;
 using UnityEngine;
 
@@ -9,217 +10,149 @@ namespace TopDownMedieval.Plugins.Commons.Utils
         /*----------------------------------------------------------------------------------------*
          * Static Methods
          *----------------------------------------------------------------------------------------*/
-    
-        public static int GetNumberMotionsInBlendTree(Animator animator, int layerIndex, int blendTreeHashIndex)
-        {
-            AnimatorController animatorController = animator.runtimeAnimatorController as AnimatorController;
-            AnimatorStateMachine stateMachine = animatorController.layers[layerIndex].stateMachine;
-            foreach (ChildAnimatorState state in stateMachine.states)
-            {
-                if (state.GetHashCode() == blendTreeHashIndex) 
-                {
-                    BlendTree _blendTree = state.state.motion as BlendTree;
-                    return _blendTree.children.Length;
-                }
-            }        
-            return 0;
-        }
-    
-        public static BlendTree GetBlendTree(Animator animator)
-        {
-            AnimatorController animatorController = animator.runtimeAnimatorController as AnimatorController;
+
+        #region AnimatorControllers
         
-            AnimatorControllerLayer layer = animatorController.layers[0];
-        
-            AnimatorStateMachine stateMachine = layer.stateMachine;
-            ChildAnimatorStateMachine childAnimatorStateMachine = stateMachine.stateMachines[0];
-            AnimatorStateMachine stateMachineChild = childAnimatorStateMachine.stateMachine;
-        
-            ChildAnimatorState state = stateMachineChild.states[0];
-            BlendTree blendTree = state.state.motion as BlendTree;
+	    public static AnimatorController FindAnimatorController(RuntimeAnimatorController runtimeAnimatorController)
+	    {
+		    if (runtimeAnimatorController is AnimatorOverrideController overrideController)
+		    {
+			    return (AnimatorController) overrideController.runtimeAnimatorController;
+		    }
+			return (AnimatorController) runtimeAnimatorController;
+	    }
 
-            return blendTree;
-        }
-    
-        /* AnimatorStateMachine */
-    
-        public static List<AnimatorStateMachine> FindAnimatorStateMachines(Animator animator, int layerIndex = -1, string stateMachineName = null) 
-        {
-            AnimatorController animatorController = animator.runtimeAnimatorController as AnimatorController;
+	    #endregion
 
-            if (layerIndex >= 0)
-            {
-                AnimatorControllerLayer layer = animatorController.layers[layerIndex];
-                return FindAnimatorStateMachines(layer, stateMachineName);
-            }
-            else
-            {
-                List<AnimatorStateMachine> stateMachines = new List<AnimatorStateMachine>();
-                foreach (AnimatorControllerLayer layer in animatorController.layers)
-                {
-                    stateMachines = FindAnimatorStateMachines(layer, stateMachineName);
-                }
-                return stateMachines; 
-            }
-        }
+	    #region Layers
 
-        public static List<AnimatorStateMachine> FindAnimatorStateMachines(AnimatorControllerLayer layer, string stateMachineName = null)
-        {
-            List<AnimatorStateMachine> stateMachines = new List<AnimatorStateMachine>();
-        
-            AnimatorStateMachine stateMachine = layer.stateMachine;
-            if (stateMachineName != null && stateMachineName == stateMachine.name)
-            {
-                stateMachines.Add(stateMachine);
-                return stateMachines;
-            }
-            foreach (ChildAnimatorStateMachine child in stateMachine.stateMachines)
-            {
-                stateMachines = FindAnimatorStateMachines(child, stateMachines, stateMachineName);
-            }
+	    public static AnimatorControllerLayer FindLayer(RuntimeAnimatorController runtimeAnimatorController, string layerName)
+	    {
+		    AnimatorController controller = FindAnimatorController(runtimeAnimatorController);
+		    return FindLayer(controller, layerName);
+	    }
 
-            return stateMachines;
-        }
+	    public static AnimatorControllerLayer FindLayer(AnimatorController controller, string layerName)
+	    {
+		    AnimatorControllerLayer layer = null;
+		    foreach (AnimatorControllerLayer layerChild in controller.layers)
+		    {
+			    if (layerChild.name == layerName)
+			    {
+				    layer = layerChild;
+				    break;
+			    }
+		    }
 
-        private static List<AnimatorStateMachine> FindAnimatorStateMachines(ChildAnimatorStateMachine parent, List<AnimatorStateMachine> result, string stateMachineName = null)
-        {
-            AnimatorStateMachine stateMachine = parent.stateMachine;
-            if (stateMachineName != null)
-            {
-                if (stateMachineName == stateMachine.name)
-                {
-                    result.Add(stateMachine);
-                }
-            }
-            else
-            {
-                result.Add(stateMachine);
-            }
-            foreach (ChildAnimatorStateMachine child in stateMachine.stateMachines)
-            {
-                result = FindAnimatorStateMachines(child, result);
-            }
-        
-            return result;
-        }
-    
-    
-        /* AnimatorState */
-    
-        public static List<AnimatorState> FindAnimatorStates(Animator animator, int layerIndex = -1) 
-        {
-            AnimatorController animatorController = animator.runtimeAnimatorController as AnimatorController;
-    
-            if (layerIndex >= 0)
-            {
-                AnimatorControllerLayer layer = animatorController.layers[layerIndex];
-                return FindAnimatorStates(layer);
-            }
-            else
-            {
-                List<AnimatorState> result = new List<AnimatorState>();
-                foreach (AnimatorControllerLayer layer in animatorController.layers)
-                {
-                    result = FindAnimatorStates(layer);
-                }
-                return result; 
-            }
-        }
-    
-        public static List<AnimatorState> FindAnimatorStates(AnimatorControllerLayer layer)
-        {
-            List<AnimatorState> motions = new List<AnimatorState>();
-        
-            AnimatorStateMachine stateMachine = layer.stateMachine;
-            foreach (ChildAnimatorStateMachine child in stateMachine.stateMachines)
-            {
-                motions = FindAnimatorStates(child, motions);
-            }
-    
-            return motions;
-        }
-    
-        private static List<AnimatorState> FindAnimatorStates(ChildAnimatorStateMachine parent, List<AnimatorState> result)
-        {
-            foreach (ChildAnimatorState child in parent.stateMachine.states)
-            {
-                AnimatorState state = child.state;
-                if (state)
-                {
-                    result.Add(state);
-                }
-            }
-            foreach (ChildAnimatorStateMachine child in parent.stateMachine.stateMachines)
-            {
-                result = FindAnimatorStates(child, result);
-            }
-        
-            return result;
-        }
-    
-        /* Motion */
+		    return layer;
+	    }
 
-        public static List<T> FindMotions<T>(Animator animator, int layerIndex = -1) where T : Motion
-        {
-            AnimatorController animatorController = animator.runtimeAnimatorController as AnimatorController;
+	    #endregion
 
-            if (layerIndex >= 0)
-            {
-                AnimatorControllerLayer layer = animatorController.layers[layerIndex];
-                return FindMotions<T>(layer);
-            }
-            else
-            {
-                List<T> result = new List<T>();
-                foreach (AnimatorControllerLayer layer in animatorController.layers)
-                {
-                    result = FindMotions<T>(layer);
-                }
-                return result; 
-            }
-        }
+	    #region StateMachines
 
-        public static List<T> FindMotions<T>(AnimatorControllerLayer layer) where T : Motion
-        {
-            List<T> motions = new List<T>();
-        
-            AnimatorStateMachine stateMachine = layer.stateMachine;
-            foreach (ChildAnimatorStateMachine child in stateMachine.stateMachines)
-            {
-                motions = FindMotions(child, motions);
-            }
+	    public static AnimatorStateMachine FindStateMachine(RuntimeAnimatorController runtimeAnimatorController,
+		    string layerName, params string[] stateMachineNames)
+	    {
+		    AnimatorControllerLayer layer = FindLayer(runtimeAnimatorController, layerName);
+		    return FindStateMachine(layer, stateMachineNames);
+	    }
 
-            return motions;
-        }
+	    public static AnimatorStateMachine FindStateMachine(AnimatorControllerLayer layer, params string[] stateMachineNames)
+	    {
+		    return FindStateMachine(layer.stateMachine, stateMachineNames);
+	    }
 
-        private static List<T> FindMotions<T>(ChildAnimatorStateMachine parent, List<T> result) where T : Motion
-        {
-            foreach (ChildAnimatorState state in parent.stateMachine.states)
-            {
-                T motion = state.state?.motion as T;
-                if (motion)
-                {
-                    result.Add(motion);
-                }
-                BlendTree blendTree = state.state?.motion as BlendTree;
-                if (blendTree)
-                {
-                    foreach (ChildMotion child in blendTree.children)
-                    {
-                        motion = child.motion as T;
-                        if (motion)
-                        {
-                            result.Add(motion);
-                        }
-                    }
-                }
-            }
-            foreach (ChildAnimatorStateMachine child in parent.stateMachine.stateMachines)
-            {
-                result = FindMotions(child, result);
-            }
-        
-            return result;
-        }
+	    public static AnimatorStateMachine FindStateMachine(AnimatorStateMachine stateMachine, params string[] stateMachineNames)
+	    {
+		    if (stateMachineNames is null)
+		    {
+			    throw new ArgumentNullException("stateMachineNames cannot be null");
+		    }
+
+		    ChildAnimatorStateMachine[] children = stateMachine.stateMachines;
+		    for (int i = 0; i < stateMachineNames.Length; i++)
+		    {
+			    foreach (ChildAnimatorStateMachine childStateMachine in children)
+			    {
+				    if (i < stateMachineNames.Length - 1)
+				    {
+					    children = childStateMachine.stateMachine.stateMachines;
+				    }
+				    else if (childStateMachine.stateMachine.name == stateMachineNames[i])
+				    {
+					    return childStateMachine.stateMachine;
+				    }
+			    }
+		    }
+
+		    return stateMachine;
+	    }
+
+	    #endregion
+
+	    #region States
+
+	    public static AnimatorState FindState(RuntimeAnimatorController runtimeAnimatorController,
+		    string layerName, string stateMachineName, string stateName)
+	    {
+		    AnimatorStateMachine stateMachine = FindStateMachine(runtimeAnimatorController, layerName, stateMachineName);
+		    return FindState(stateMachine, stateName);
+	    }
+
+	    public static AnimatorState FindState(AnimatorStateMachine stateMachine, string stateName)
+	    {
+		    foreach (ChildAnimatorState childState in stateMachine.states)
+		    {
+			    if (childState.state.name == stateName)
+			    {
+				    return childState.state;
+			    }
+		    }
+
+		    return null;
+	    }
+
+	    #endregion
+
+	    #region Transitions
+
+	    public static List<AnimatorStateTransition> FindTransitionsByState(RuntimeAnimatorController runtimeAnimatorController,
+		    string layerName, string stateMachineName, string stateName, string destinationStateName)
+	    {
+		    AnimatorState state = FindState(runtimeAnimatorController, layerName, stateMachineName, stateName);
+
+		    List<AnimatorStateTransition> transitions = null;
+		    foreach (AnimatorStateTransition childTransition in state.transitions)
+		    {
+			    if (childTransition.destinationState.name == destinationStateName)
+			    {
+				    transitions.Add(childTransition);
+			    }
+		    }
+
+		    return transitions;
+	    }
+
+	    public static List<AnimatorStateTransition> FindTransitionsByStateMachine(
+		    RuntimeAnimatorController runtimeAnimatorController, string layerName, string stateMachineName,
+		    string stateName, string destinationStateMachineName)
+	    {
+		    AnimatorState state = FindState(runtimeAnimatorController, layerName, stateMachineName, stateName);
+
+		    List<AnimatorStateTransition> transitions = new List<AnimatorStateTransition>();
+		    foreach (AnimatorStateTransition childTransition in state.transitions)
+		    {
+			    if (childTransition.destinationStateMachine.name == destinationStateMachineName)
+			    {
+				    transitions.Add(childTransition);
+			    }
+		    }
+
+		    return transitions;
+	    }
+
+	    #endregion
+
     }
 }
