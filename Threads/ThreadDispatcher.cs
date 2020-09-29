@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace TopDownMedieval.Plugins.Commons.Utils
 {
-	public class UnityDispatcher : MonoBehaviour
+	public class ThreadDispatcher : MonoBehaviour
 	{
 		public static void RunAsync(Action action) {
 			ThreadPool.QueueUserWorkItem(o => action());
@@ -27,7 +27,7 @@ namespace TopDownMedieval.Plugins.Commons.Utils
 		private static void Initialize()
 		{
 			if(_instance == null) {
-				_instance = new GameObject("Dispatcher").AddComponent<UnityDispatcher>();
+				_instance = new GameObject("ThreadDispatcher").AddComponent<ThreadDispatcher>();
 				DontDestroyOnLoad(_instance.gameObject);
 			}
 		}
@@ -37,7 +37,7 @@ namespace TopDownMedieval.Plugins.Commons.Utils
 			if(_queued)
 			{
 				lock(_backlog) {
-					var tmp = _actions;
+					List<Action> tmp = _actions;
 					_actions = _backlog;
 					_backlog = tmp;
 					_queued = false;
@@ -50,7 +50,7 @@ namespace TopDownMedieval.Plugins.Commons.Utils
 			}
 		}
  
-		static UnityDispatcher _instance;
+		static ThreadDispatcher _instance;
 		static volatile bool _queued = false;
 		static List<Action> _backlog = new List<Action>(8);
 		static List<Action> _actions = new List<Action>(8);

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TopDownMedieval.Plugins.Commons.Utils
 {
@@ -126,6 +127,16 @@ namespace TopDownMedieval.Plugins.Commons.Utils
         {
             rectTransform.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
             rectTransform.GetComponent<RectTransform>().anchorMax = new Vector2(1, 1);
+        }
+
+        public static void ClearChildren(this Transform transform)
+        {
+	        transform.DetachChildren();
+        }
+
+        public static void RebuildLayoutImmediate(this Transform transform)
+        {
+	        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) transform);
         }
 
         /*----------------------------------------------------------------------------------------*
