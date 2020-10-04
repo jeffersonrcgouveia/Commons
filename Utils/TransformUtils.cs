@@ -131,7 +131,10 @@ namespace TopDownMedieval.Plugins.Commons.Utils
 
         public static void ClearChildren(this Transform transform)
         {
-	        transform.DetachChildren();
+	        for (int i = transform.childCount - 1; i >= 0; i--)
+	        {
+		        GameObject.Destroy(transform.GetChild(i).gameObject);
+	        }
         }
 
         public static void RebuildLayoutImmediate(this Transform transform)

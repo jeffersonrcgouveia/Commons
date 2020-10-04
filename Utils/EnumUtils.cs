@@ -33,6 +33,16 @@ namespace TopDownMedieval.Plugins.Commons.Utils
 	        return values;
         }
 
+        public static T ToEnum<T>(int enumValueIndex) where T : Enum
+        {
+	        return (T) Enum.GetValues(typeof(T)).GetValue(enumValueIndex);
+        }
+
+        public static int ToEnumValueIndex<T>(T enumObj) where T : Enum
+        {
+	        return Convert.ToInt32(enumObj);
+        }
+
         /*----------------------------------------------------------------------------------------*
          * Inner Classes and Delegates
          *----------------------------------------------------------------------------------------*/
