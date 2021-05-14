@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class IReadOnlyListExtensions
+namespace Commons.Extensions
 {
-    public static T GetRandomValue<T>(this IReadOnlyList<T> list)
+    public static class IReadOnlyListExtensions
     {
-        return list[Random.Range(0, list.Count)];
+        public static T GetRandomValue<T>(this IReadOnlyList<T> list) => list[Random.Range(0, list.Count)];
     }
 }

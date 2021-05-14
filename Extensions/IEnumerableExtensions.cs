@@ -1,20 +1,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class IEnumerableExtensions
+namespace Commons.Extensions
 {
-	/**
-	 * Check if a collection of gameobjects is empty even after its items were destroyed, but not removed from the
-	 * collection. This method doesn't work properly if the collection type (GameObject) is replaced by a generic type.
-	 */
-	public static bool IsEmpty(this IEnumerable<GameObject> list)
+	public static class IEnumerableExtensions
 	{
-		foreach (GameObject obj in list)
+		/**
+		 * Check if a collection of gameobjects is empty even after its items were destroyed, but not removed from the
+		 * collection. This method doesn't work properly if the collection type (GameObject) is replaced by a generic type.
+		 */
+		public static bool IsEmpty(this IEnumerable<GameObject> list)
 		{
-			if (obj != null) return false;
+			foreach (GameObject obj in list)
+			{
+				if (obj != null) return false;
+			}
+
+			return true;
 		}
 
-		return true;
 	}
-
 }
