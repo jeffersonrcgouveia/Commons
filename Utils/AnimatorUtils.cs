@@ -58,10 +58,7 @@ namespace TopDownMedieval.Plugins.Commons.Utils
 		    return FindStateMachine(layer, stateMachineNames);
 	    }
 
-	    public static AnimatorStateMachine FindStateMachine(AnimatorControllerLayer layer, params string[] stateMachineNames)
-	    {
-		    return FindStateMachine(layer.stateMachine, stateMachineNames);
-	    }
+	    public static AnimatorStateMachine FindStateMachine(AnimatorControllerLayer layer, params string[] stateMachineNames) => FindStateMachine(layer.stateMachine, stateMachineNames);
 
 	    public static AnimatorStateMachine FindStateMachine(AnimatorStateMachine stateMachine, params string[] stateMachineNames)
 	    {

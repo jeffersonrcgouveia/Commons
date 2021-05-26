@@ -11,43 +11,43 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
     [DebuggerDisplay("Count = {Count}")]
     public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
-        private readonly IEqualityComparer<TKey> _Comparer;
+        readonly IEqualityComparer<TKey> _Comparer;
         
         [SerializeField]
         [HideInInspector]
-        private int[] _Buckets;
+        int[] _Buckets;
         
         [SerializeField]
         [HideInInspector]
-        private int _Count;
+        int _Count;
 
         [SerializeField]
         [HideInInspector]
-        private int _FreeCount;
+        int _FreeCount;
         
         [SerializeField]
         [HideInInspector]
-        private int _FreeList;
+        int _FreeList;
         
         [SerializeField]
         [HideInInspector]
-        private int[] _HashCodes;
-        
-        [SerializeField]
-        [HideInInspector] 
-        private TKey[] _Keys;
-        
-        [SerializeField]
-        [HideInInspector] 
-        private int[] _Next;
+        int[] _HashCodes;
         
         [SerializeField]
         [HideInInspector]
-        private TValue[] _Values;
+        TKey[] _Keys;
         
         [SerializeField]
-        [HideInInspector] 
-        private int _Version;
+        [HideInInspector]
+        int[] _Next;
+        
+        [SerializeField]
+        [HideInInspector]
+        TValue[] _Values;
+        
+        [SerializeField]
+        [HideInInspector]
+        int _Version;
 
         public SerializableDictionary()
             : this(0, null)
@@ -118,10 +118,7 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
             set => Insert(key, value, false);
         }
 
-        public bool ContainsKey(TKey key)
-        {
-            return FindIndex(key) >= 0;
-        }
+        public bool ContainsKey(TKey key) => FindIndex(key) >= 0;
 
         public void Clear()
         {
@@ -230,20 +227,11 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
 
         public bool IsReadOnly => false;
 
-        public bool Remove(KeyValuePair<TKey, TValue> item)
-        {
-            return Remove(item.Key);
-        }
+        public bool Remove(KeyValuePair<TKey, TValue> item) => Remove(item.Key);
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() => GetEnumerator();
 
         public bool ContainsValue(TValue value)
         {
@@ -264,7 +252,7 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
             return false;
         }
 
-        private void Resize(int newSize, bool forceNewHashCodes)
+        void Resize(int newSize, bool forceNewHashCodes)
         {
             int[] bucketsCopy = new int[newSize];
             for (int i = 0; i < bucketsCopy.Length; i++)
@@ -299,12 +287,12 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
             _Next = nextCopy;
         }
 
-        private void Resize()
+        void Resize()
         {
             Resize(PrimeHelper.ExpandPrime(_Count), false);
         }
 
-        private void Insert(TKey key, TValue value, bool add)
+        void Insert(TKey key, TValue value, bool add)
         {
             if (key == null)
                 throw new ArgumentNullException("key");
@@ -363,7 +351,7 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
             //}
         }
 
-        private void Initialize(int capacity)
+        void Initialize(int capacity)
         {
             int prime = PrimeHelper.GetPrime(capacity);
 
@@ -379,7 +367,7 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
             _FreeList = -1;
         }
 
-        private int FindIndex(TKey key)
+        int FindIndex(TKey key)
         {
             if (key == null)
                 throw new ArgumentNullException("key");
@@ -395,12 +383,9 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
             return -1;
         }
 
-        public Enumerator GetEnumerator()
-        {
-            return new Enumerator(this);
-        }
+        public Enumerator GetEnumerator() => new Enumerator(this);
 
-        private static class PrimeHelper
+        static class PrimeHelper
         {
             public static readonly int[] Primes =
             {
@@ -520,9 +505,9 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
 
         public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>
         {
-            private readonly SerializableDictionary<TKey, TValue> _Dictionary;
-            private readonly int _Version;
-            private int _Index;
+            readonly SerializableDictionary<TKey, TValue> _Dictionary;
+            readonly int _Version;
+            int _Index;
 
             public KeyValuePair<TKey, TValue> Current { get; private set; }
 

@@ -8,9 +8,9 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
 {
     public abstract class DictionaryDrawer<TK, TV> : PropertyDrawer
     {
-        private const float kButtonWidth = 18f;
+        const float kButtonWidth = 18f;
 
-        private static readonly Dictionary<Type, Func<Rect, object, object>> _Fields =
+        static readonly Dictionary<Type, Func<Rect, object, object>> _Fields =
             new Dictionary<Type, Func<Rect, object, object>>
             {
                 {typeof(int), (rect, value) => EditorGUI.IntField(rect, (int) value)},
@@ -23,8 +23,8 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
                 {typeof(Rect), (rect, value) => EditorGUI.RectField(rect, (Rect) value)}
             };
 
-        private SerializableDictionary<TK, TV> _Dictionary;
-        private bool _Foldout;
+        SerializableDictionary<TK, TV> _Dictionary;
+        bool _Foldout;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
@@ -110,12 +110,12 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
             }
         }
 
-        private void RemoveItem(TK key)
+        void RemoveItem(TK key)
         {
             _Dictionary.Remove(key);
         }
 
-        private void CheckInitialize(SerializedProperty property, GUIContent label)
+        void CheckInitialize(SerializedProperty property, GUIContent label)
         {
             if (_Dictionary == null)
             {
@@ -131,7 +131,7 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
             }
         }
 
-        private static T DoField<T>(Rect rect, Type type, T value)
+        static T DoField<T>(Rect rect, Type type, T value)
         {
             Func<Rect, object, object> field;
             if (_Fields.TryGetValue(type, out field))
@@ -147,12 +147,12 @@ namespace TopDownMedieval.Plugins.Commons.Drawers
             return value;
         }
 
-        private void ClearDictionary()
+        void ClearDictionary()
         {
             _Dictionary.Clear();
         }
 
-        private void AddNewItem()
+        void AddNewItem()
         {
             TK key;
             if (typeof(TK) == typeof(string))

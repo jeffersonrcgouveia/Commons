@@ -24,15 +24,15 @@ namespace TopDownMedieval.Plugins.Commons.Utils
 		}
  
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-		private static void Initialize()
+		static void Initialize()
 		{
 			if(_instance == null) {
 				_instance = new GameObject("ThreadDispatcher").AddComponent<ThreadDispatcher>();
 				DontDestroyOnLoad(_instance.gameObject);
 			}
 		}
- 
-		private void Update()
+
+		void Update()
 		{
 			if(_queued)
 			{
