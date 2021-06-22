@@ -7,47 +7,28 @@ using UnityEngine;
 
 namespace TopDownMedieval.Plugins.Commons.Drawers
 {
-    [Serializable]
-    [DebuggerDisplay("Count = {Count}")]
+    [Serializable, DebuggerDisplay("Count = {Count}")]
     public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
         readonly IEqualityComparer<TKey> _Comparer;
-        
-        [SerializeField]
-        [HideInInspector]
-        int[] _Buckets;
-        
-        [SerializeField]
-        [HideInInspector]
-        int _Count;
 
-        [SerializeField]
-        [HideInInspector]
-        int _FreeCount;
-        
-        [SerializeField]
-        [HideInInspector]
-        int _FreeList;
-        
-        [SerializeField]
-        [HideInInspector]
-        int[] _HashCodes;
-        
-        [SerializeField]
-        [HideInInspector]
-        TKey[] _Keys;
-        
-        [SerializeField]
-        [HideInInspector]
-        int[] _Next;
-        
-        [SerializeField]
-        [HideInInspector]
-        TValue[] _Values;
-        
-        [SerializeField]
-        [HideInInspector]
-        int _Version;
+        [SerializeField, HideInInspector] int[] _Buckets;
+
+        [SerializeField, HideInInspector] int _Count;
+
+        [SerializeField, HideInInspector] int _FreeCount;
+
+        [SerializeField, HideInInspector] int _FreeList;
+
+        [SerializeField, HideInInspector] int[] _HashCodes;
+
+        [SerializeField, HideInInspector] TKey[] _Keys;
+
+        [SerializeField, HideInInspector] int[] _Next;
+
+        [SerializeField, HideInInspector] TValue[] _Values;
+
+        [SerializeField, HideInInspector] int _Version;
 
         public SerializableDictionary()
             : this(0, null)
